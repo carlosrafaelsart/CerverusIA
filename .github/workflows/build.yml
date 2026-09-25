@@ -1,0 +1,26 @@
+name: Build Cerberus APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Crear archivos de recursos
+        run: |
+          mkdir -p app/src/main/res/values
+          echo '<?xml version="1.0" encoding="utf-8"?><resources><style name="Theme.Cerberus" parent="Theme.Material3.Dark.NoActionBar"/></resources>' > app/src/main/res/values/themes.xml
+          echo '<?xml version="1.0" encoding="utf-8"?><resources></resources>' > app/src/main/res/values/strings.xml
+          echo '<?xml version="1.0" encoding="utf-8"?><resources></resources>' > app/src/main/res/values/colors.xml
+      - name: Dar permiso y compilar
+        run: |
+          chmod +x gradlew 2>/dev/null || true
+          ./gradlew assembleDebug --stacktrace
+      - name: Subir APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CerberusIA-v2.0
+          path: app/build/outputs/apk/debug/*.apk
